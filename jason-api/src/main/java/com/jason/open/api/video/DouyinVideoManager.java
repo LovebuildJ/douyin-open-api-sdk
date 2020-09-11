@@ -71,6 +71,28 @@ public class DouyinVideoManager {
     }
 
     /**
+     * 创建抖音视频
+     * @param openId  用户唯一标志
+     * @param accessToken access_token
+     * @param body The body parameter
+     */
+    public VideoCreateAwemeCreateInlineResponse2001 createVideo(String openId, String accessToken ,VideoCreateAwemeCreateBody1 body) {
+        if (StrUtil.isBlank(openId)||StrUtil.isBlank(accessToken)) {
+            throw new VideoException("openId , accessToken 不能为空!!");
+        }
+
+        VideoCreateAwemeCreateInlineResponse2001 result = null;
+        try {
+            result = videoPublishApi.videoCreatePost(openId, accessToken, body);
+        } catch (RestClientException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
+
+    /**
      *  视频分片上传 超过50m的视频建议采用分片上传
      * @param video         视频文件
      * @param partTotal     总片数
