@@ -1,7 +1,7 @@
 package com.jason.open.api.utils;
 
 /**
- * @Description TODO
+ * @Description 计算文件大小工具
  * @Date 2020/9/11 15:51
  * @Author by 尘心
  */
