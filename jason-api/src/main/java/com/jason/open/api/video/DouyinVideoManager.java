@@ -1,7 +1,7 @@
 package com.jason.open.api.video;
 
 import cn.hutool.core.util.StrUtil;
-import com.douyin.open.api.VideoPublishApi;
+import com.douyin.open.api.*;
 import com.douyin.open.models.*;
 import com.jason.open.api.utils.DouyinConstant;
 import com.jason.open.api.utils.FileSizeUtil;
@@ -22,10 +22,30 @@ public class DouyinVideoManager {
     /** 视频发布api */
     private VideoPublishApi videoPublishApi;
 
+    /** 视频删除api */
+    private VideoDeleteApi deleteApi;
+
+    /** 图片发布 api */
+    private ImageApi imageApi;
+
+    /** 视频列表 */
+    private VideoListApi videoListApi;
+
+    /** 视频数据 */
+    private VideoDataApi videoDataApi;
+
+    /** 查询POI信息 */
+    private PoiSearchApi poiSearchApi;
+
 
     /** 初始化构造器 */
     public DouyinVideoManager() {
         videoPublishApi = new VideoPublishApi();
+        imageApi = new ImageApi();
+        deleteApi = new VideoDeleteApi();
+        videoListApi = new VideoListApi();
+        videoDataApi = new VideoDataApi();
+        poiSearchApi = new PoiSearchApi();
     }
 
 
@@ -72,6 +92,9 @@ public class DouyinVideoManager {
 
     /**
      * 创建抖音视频
+     * <p>
+     *     Scope: `video.create`需要申请权限需要用户授权
+     * </p>
      * @param openId  用户唯一标志
      * @param accessToken access_token
      * @param body The body parameter
@@ -90,6 +113,150 @@ public class DouyinVideoManager {
         return result;
     }
 
+    /**
+     * 删除视频
+     * <p>
+     *     scope：'video.delete'需要申请权限需要用户授权
+     * </p>
+     * @param openId  用户唯一标志
+     * @param accessToken access_token
+     * @param body 抖音视频id
+     */
+    public VideoDeleteAwemeDeleteInlineResponse200 delVideo(String openId, String accessToken, VideoDeleteAwemeDeleteBody body) {
+        if (StrUtil.isBlank(openId)||StrUtil.isBlank(accessToken)) {
+            throw new VideoException("openId , accessToken 不能为空!!");
+        }
+
+        VideoDeleteAwemeDeleteInlineResponse200 result = null;
+        try {
+            result = deleteApi.videoDeletePost(openId, accessToken, body);
+        } catch (RestClientException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
+    /**
+     * 上传图片
+     * <p>
+     *     Scope: `video.create`需要申请权限需要用户授权
+     * </p>
+     * @param image 图片文件
+     * @param openId  用户唯一标志
+     * @param accessToken access_token
+     * @return
+     */
+    public ImageCreateImageCreateInlineResponse200 uploadImage(File image, String openId, String accessToken) {
+        if (StrUtil.isBlank(openId)||StrUtil.isBlank(accessToken)||image == null) {
+            throw new VideoException("图片文件, openId , accessToken 不能为空!!");
+        }
+        ImageCreateImageCreateInlineResponse200 result = null;
+        try {
+            result = imageApi.imageUploadPost(image, openId, accessToken);
+        } catch (RestClientException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    /**
+     * 发布图片
+     * <p>
+     *     Scope: `video.create`需要申请权限需要用户授权
+     * </p>
+     * @param openId  用户唯一标志
+     * @param accessToken access_token
+     * @param body body
+     */
+    public ImageCreateImageCreateInlineResponse2001 publishImage(String openId, String accessToken ,ImageCreateImageCreateBody1  body) {
+        if (StrUtil.isBlank(openId)||StrUtil.isBlank(accessToken)) {
+            throw new VideoException("openId , accessToken 不能为空!!");
+        }
+
+        ImageCreateImageCreateInlineResponse2001 result = null;
+        try {
+            result = imageApi.imageCreatePost(openId, accessToken, body);
+        } catch (RestClientException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    /**
+     * 授权账号视频列表
+     * <p>
+     *     Scope：'video.list'需要用户授权需要申请权限
+     * </p>
+     * @param openId  用户唯一标志
+     * @param accessToken access_token
+     * @param pageNum       当前页
+     * @param pageSize      每页总记录数
+     */
+    public VideoListVideoListInlineResponse200 videoList(String openId, String accessToken,Integer pageNum,Integer pageSize) {
+        long pageRow = 0;
+        if (pageNum!=null&&pageNum>0) {
+            pageRow = (long)(pageNum*pageSize - pageSize);
+        }
+
+        VideoListVideoListInlineResponse200 result = null;
+        try {
+            result = videoListApi.videoListGet(openId, accessToken, pageSize, pageRow);
+        } catch (RestClientException e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+    /**
+     * 查询指定视频数据
+     * @param openId        用户唯一标志
+     * @param accessToken   access_token
+     * @param body item_id数组，仅能查询access_token对应用户上传的视频
+     * @return
+     */
+    public VideoDataVideoDataInlineResponse200 videoDataList(String openId, String accessToken,VideoDataVideoDataBody body) {
+        if (StrUtil.isBlank(openId)||StrUtil.isBlank(accessToken)) {
+            throw new VideoException("openId , accessToken 不能为空!!");
+        }
+
+        VideoDataVideoDataInlineResponse200 result = null;
+        try {
+            result = videoDataApi.videoDataPost(body, openId, accessToken);
+        } catch (RestClientException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    /**
+     * 查询POI信息
+     * @param keyword       关键字
+     * @param city          城市
+     * @param accessToken   accessToken
+     * @param pageNum       当前页
+     * @param pageSize      每页总记录数
+     * @return
+     */
+    public VideoPoiVideoPoiInlineResponse200 poiSearchKeywordGet( String accessToken,String keyword, String city, Integer pageNum,Integer pageSize) {
+        if (StrUtil.isBlank(accessToken)) {
+            throw new VideoException("openId , accessToken 不能为空!!");
+        }
+
+        long pageRow = 0;
+        if (pageNum!=null&&pageNum>0) {
+            pageRow = (long)(pageNum*pageSize - pageSize);
+        }
+
+        VideoPoiVideoPoiInlineResponse200 result = null;
+        try {
+            result = poiSearchApi.poiSearchKeywordGet(accessToken, pageSize, keyword, pageRow, city);
+        } catch (RestClientException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 
 
     /**
@@ -222,8 +389,6 @@ public class DouyinVideoManager {
 
         return result;
     }
-
-
 
 
 }
