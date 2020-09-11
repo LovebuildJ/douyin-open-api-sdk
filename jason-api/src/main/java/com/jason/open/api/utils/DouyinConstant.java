@@ -11,5 +11,8 @@ public class DouyinConstant {
     public static final String CONFIG_PATH = "config.properties";
 
     /** 单个视频, 最大大小 50mb, 超过则使用分片上传 */
-    public static final long SINGE_VIDEO_MAX_SIZE = 50;
+    public static final double SINGE_VIDEO_MAX_SIZE = 50;
+
+    /** 接口正常 */
+    public static final Integer OK = 0;
 }

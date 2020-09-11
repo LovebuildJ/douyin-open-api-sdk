@@ -7,6 +7,7 @@ package com.jason.open.api.utils;
  */
 import java.io.File;
 import java.io.FileInputStream;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
 public class FileSizeUtil {
@@ -66,6 +67,24 @@ public class FileSizeUtil {
         }
         return formatFileSize(blockSize);
     }
+
+    /**
+     * 将视频按照大小进行切片
+     * @return 切成多少片
+     */
+    public static Integer slicedVideo(double size) {
+        if (size > DouyinConstant.SINGE_VIDEO_MAX_SIZE) {
+            BigDecimal total = new BigDecimal(size);
+            BigDecimal partSize = new BigDecimal(DouyinConstant.SINGE_VIDEO_MAX_SIZE);
+
+            BigDecimal divide = total.divide(partSize);
+            // 向下取整
+            return divide.setScale( 0, BigDecimal.ROUND_DOWN ).intValue();
+        }
+
+        return 0;
+    }
+
 
     /**
      * 获取指定文件大小
